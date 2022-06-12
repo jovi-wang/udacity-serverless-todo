@@ -52,14 +52,19 @@ export class TodoData {
       .promise()
   }
 
-  async updateTodoItem(todoId: string, todoUpdate: TodoUpdate): Promise<void> {
+  async updateTodoItem(
+    userId: string,
+    todoId: string,
+    todoUpdate: TodoUpdate
+  ): Promise<void> {
     logger.info(`Update todo item ${todoId} with param: `, todoUpdate)
 
     await this.docClient
       .update({
         TableName: this.todosTable,
         Key: {
-          todoId
+          todoId,
+          userId
         },
         UpdateExpression: 'set #name = :name, dueDate = :dueDate, done = :done',
         ExpressionAttributeNames: {
@@ -74,26 +79,28 @@ export class TodoData {
       .promise()
   }
 
-  async deleteTodoItem(todoId: string): Promise<void> {
+  async deleteTodoItem(userId: string, todoId: string): Promise<void> {
     logger.info(`Delete todo item ${todoId}`)
     await this.docClient
       .delete({
         TableName: this.todosTable,
         Key: {
-          todoId: todoId
+          todoId,
+          userId
         }
       })
       .promise()
   }
 
-  async getTodoById(todoId: string): Promise<TodoItem> {
+  async getTodo(userId: string, todoId: string): Promise<TodoItem> {
     logger.info(`Get todo by id: ${todoId}`)
 
     const result = await this.docClient
       .get({
         TableName: this.todosTable,
         Key: {
-          todoId
+          todoId,
+          userId
         }
       })
       .promise()
@@ -101,7 +108,7 @@ export class TodoData {
     const item = result.Item
     return item as TodoItem
   }
-  async generateUploadUrl(todoId: string): Promise<String> {
+  async generateUploadUrl(userId: string, todoId: string): Promise<String> {
     const url = getUploadUrl(todoId, this.bucketName)
 
     const attachmentUrl: string =
@@ -109,9 +116,7 @@ export class TodoData {
 
     const options = {
       TableName: this.todosTable,
-      Key: {
-        todoId: todoId
-      },
+      Key: { todoId, userId },
       UpdateExpression: 'set attachmentUrl = :url',
       ExpressionAttributeValues: {
         ':url': attachmentUrl

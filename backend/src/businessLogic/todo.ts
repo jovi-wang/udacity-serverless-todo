@@ -13,8 +13,11 @@ export const getTodos = async (userId: string): Promise<TodoItem[]> => {
   return await todoData.getTodos(userId)
 }
 
-export const getTodoById = async (todoId: string): Promise<TodoItem> => {
-  return await todoData.getTodoById(todoId)
+export const getTodo = async (
+  userId: string,
+  todoId: string
+): Promise<TodoItem> => {
+  return await todoData.getTodo(userId, todoId)
 }
 
 export const createTodo = async (
@@ -37,16 +40,23 @@ export const createTodo = async (
 }
 
 export const updateTodo = async (
+  userId: string,
   todoId: string,
   updateTodoRequest: UpdateTodoRequest
 ): Promise<void> => {
-  await todoData.updateTodoItem(todoId, updateTodoRequest as TodoUpdate)
+  await todoData.updateTodoItem(userId, todoId, updateTodoRequest as TodoUpdate)
 }
 
-export const deleteTodo = async (todoId: string): Promise<void> => {
-  await todoData.deleteTodoItem(todoId)
+export const deleteTodo = async (
+  userId: string,
+  todoId: string
+): Promise<void> => {
+  await todoData.deleteTodoItem(userId, todoId)
 }
 
-export const generateUploadUrl = (todoId: string): Promise<String> => {
-  return todoData.generateUploadUrl(todoId)
+export const generateUploadUrl = (
+  userId: string,
+  todoId: string
+): Promise<String> => {
+  return todoData.generateUploadUrl(userId, todoId)
 }

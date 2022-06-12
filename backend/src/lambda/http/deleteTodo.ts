@@ -7,7 +7,7 @@ import {
 } from 'aws-lambda'
 import { getUserId } from '../utils'
 
-import { deleteTodo, getTodoById } from '../../businessLogic/todo'
+import { deleteTodo, getTodo } from '../../businessLogic/todo'
 import { createLogger } from '../../utils/logger'
 const logger = createLogger('deleteTodo')
 
@@ -17,10 +17,10 @@ export const handler: APIGatewayProxyHandler = async (
   logger.info('delete todo handler', event)
   const todoId = event.pathParameters.todoId
   const userId = getUserId(event)
-  const todoItem = await getTodoById(todoId)
+  const todoItem = await getTodo(userId, todoId)
 
   if (!todoItem) {
-    logger.error('No todo found with id ', todoId)
+    logger.error('No todo found with id', todoId)
     return {
       statusCode: 404,
       headers: {
@@ -33,22 +33,7 @@ export const handler: APIGatewayProxyHandler = async (
     }
   }
 
-  if (todoItem.userId !== userId) {
-    logger.error(
-      `User ${userId} does not have permission to delete todo ${todoId}`
-    )
-    return {
-      statusCode: 403,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true
-      },
-      body: JSON.stringify({
-        error: 'User does not have permission to delete this todo item'
-      })
-    }
-  }
-  await deleteTodo(todoId)
+  await deleteTodo(userId, todoId)
   return {
     statusCode: 200,
     headers: {

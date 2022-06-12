@@ -7,7 +7,7 @@ import {
 } from 'aws-lambda'
 import { getUserId } from '../utils'
 import { createLogger } from '../../utils/logger'
-import { generateUploadUrl, getTodoById } from '../../businessLogic/todo'
+import { generateUploadUrl, getTodo } from '../../businessLogic/todo'
 
 const logger = createLogger('generateUploadUrl')
 export const handler: APIGatewayProxyHandler = async (
@@ -19,10 +19,10 @@ export const handler: APIGatewayProxyHandler = async (
   const userId = getUserId(event)
 
   //check if todo item exists
-  const todoItem = await getTodoById(todoId)
+  const todoItem = await getTodo(userId, todoId)
 
   if (!todoItem) {
-    logger.error('No todo found with id ', todoId)
+    logger.error('No todo found with id', todoId)
     return {
       statusCode: 404,
       headers: {
@@ -35,23 +35,7 @@ export const handler: APIGatewayProxyHandler = async (
     }
   }
 
-  if (todoItem.userId !== userId) {
-    logger.error(
-      `User ${userId} does not have permission to update todo ${todoId}`
-    )
-    return {
-      statusCode: 403,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true
-      },
-      body: JSON.stringify({
-        error: 'User does not have permission to update this todo item'
-      })
-    }
-  }
-
-  let url = await generateUploadUrl(todoId)
+  let url = await generateUploadUrl(userId, todoId)
   return {
     statusCode: 200,
     headers: {

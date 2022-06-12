@@ -19,6 +19,21 @@ export const handler: APIGatewayProxyHandler = async (
   const userId = getUserId(event)
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
 
+  const { name, dueDate } = newTodo
+  if (!name || !dueDate) {
+    logger.error('invalid request body', newTodo)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
+      body: JSON.stringify({
+        error: 'request body is invalid!'
+      })
+    }
+  }
+
   const todoItem = await createTodo(newTodo, userId)
   return {
     statusCode: 201,

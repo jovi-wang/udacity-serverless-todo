@@ -8,7 +8,7 @@ import {
 
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 import { getUserId } from '../utils'
-import { updateTodo, getTodoById } from '../../businessLogic/todo'
+import { updateTodo, getTodo } from '../../businessLogic/todo'
 import { createLogger } from '../../utils/logger'
 const logger = createLogger('updateTodo')
 export const handler: APIGatewayProxyHandler = async (
@@ -19,10 +19,26 @@ export const handler: APIGatewayProxyHandler = async (
   const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
   const userId = getUserId(event)
 
-  const todoItem = await getTodoById(todoId)
+  const { name, dueDate, done } = updatedTodo
+
+  if (!name || !dueDate || typeof done != 'boolean') {
+    logger.error('invalid request body', updatedTodo)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
+      body: JSON.stringify({
+        error: 'request body is invalid!'
+      })
+    }
+  }
+
+  const todoItem = await getTodo(userId, todoId)
 
   if (!todoItem) {
-    logger.error('No todo found with id ', todoId)
+    logger.error('No todo found with id', todoId)
     return {
       statusCode: 404,
       headers: {
@@ -35,22 +51,7 @@ export const handler: APIGatewayProxyHandler = async (
     }
   }
 
-  if (todoItem.userId !== userId) {
-    logger.error(
-      `User ${userId} does not have permission to update todo ${todoId}`
-    )
-    return {
-      statusCode: 403,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true
-      },
-      body: JSON.stringify({
-        error: 'User does not have permission to update this todo item'
-      })
-    }
-  }
-  await updateTodo(todoId, updatedTodo)
+  await updateTodo(userId, todoId, updatedTodo)
   return {
     statusCode: 200,
     headers: {
