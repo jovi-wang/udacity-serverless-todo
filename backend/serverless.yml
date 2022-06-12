@@ -4,19 +4,6 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
-  - serverless-reqvalidator-plugin
-  - serverless-aws-documentation
-
-custom:
-  documentation:
-    api:
-      info:
-        version: '1.0.0'
-        title: serverless todo api
-    models:
-      - name: createTodo
-        contentType: 'application/json'
-        schema: ${file(./model/create-todo-request.json)}
 
 package:
   individually: true
@@ -74,12 +61,9 @@ functions:
           path: todos
           authorizer: Auth
           cors: true
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: 'create todo'
-            description: 'create todo'
-            requestModels:
-              'application/json': createTodo
+          request:
+            schemas:
+              application/json: ${file(./model/create-todo-request.json)}
 
     iamRoleStatements:
       - Effect: Allow
@@ -109,7 +93,9 @@ functions:
           path: todos/{todoId}
           authorizer: Auth
           cors: true
-          reqValidatorName: RequestBodyValidator
+          request:
+            schemas:
+              application/json: ${file(./model/update-todo-request.json)}
 
     iamRoleStatements:
       - Effect: Allow
@@ -186,15 +172,6 @@ functions:
 
 resources:
   Resources:
-    RequestBodyValidator:
-      Type: AWS::ApiGateway::RequestValidator
-      Properties:
-        Name: 'request-body-validator'
-        RestApiId:
-          Ref: ApiGatewayRestApi
-        ValidateRequestBody: true
-        ValidateRequestParameters: false
-
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
@@ -251,7 +228,7 @@ resources:
       Type: AWS::S3::BucketPolicy
       Properties:
         PolicyDocument:
-          Id: MyPolicy
+          Id: publicReadObjects
           Version: '2012-10-17'
           Statement:
             - Sid: PublicReadForGetBucketObjects

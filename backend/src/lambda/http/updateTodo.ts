@@ -19,21 +19,21 @@ export const handler: APIGatewayProxyHandler = async (
   const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
   const userId = getUserId(event)
 
-  const { name, dueDate, done } = updatedTodo
+  // const { name, dueDate, done } = updatedTodo
 
-  if (!name || !dueDate || typeof done != 'boolean') {
-    logger.error('invalid request body', updatedTodo)
-    return {
-      statusCode: 400,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true
-      },
-      body: JSON.stringify({
-        error: 'request body is invalid!'
-      })
-    }
-  }
+  // if (!name || !dueDate || typeof done != 'boolean') {
+  //   logger.error('invalid request body', updatedTodo)
+  //   return {
+  //     statusCode: 400,
+  //     headers: {
+  //       'Access-Control-Allow-Origin': '*',
+  //       'Access-Control-Allow-Credentials': true
+  //     },
+  //     body: JSON.stringify({
+  //       error: 'request body is invalid!'
+  //     })
+  //   }
+  // }
 
   const todoItem = await getTodo(userId, todoId)
 
