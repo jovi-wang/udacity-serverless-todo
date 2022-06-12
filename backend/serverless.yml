@@ -95,7 +95,7 @@ functions:
           cors: true
           request:
             schemas:
-              application/json: ${file(./model/update-todo-request.json)}
+              application/json: ${file(model/update-todo-request.json)}
 
     iamRoleStatements:
       - Effect: Allow

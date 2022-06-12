@@ -1,18 +1,18 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "todo",
-    "type": "object",
-    "properties": {
-        "name": {
-            "type": "string"
-        },
-        "dueDate": {
-            "type": "string"
-        }
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "todo",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minProperties": 1,
+      "pattern": "^[a-zA-Z0-9]+$"
     },
-    "required": [
-        "name",
-        "dueDate"
-    ],
-    "additionalProperties": true
+    "dueDate": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": ["name", "dueDate"],
+  "additionalProperties": true
 }
